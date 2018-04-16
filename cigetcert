@@ -473,6 +473,9 @@ def main():
                       type="float", metavar="num", default=1.0,
                       help="minimum hours remaining in existing cert chain " + \
                             "to keep using it instead of making a new one")
+    parser.add_option("", "--nodetect", action="store_true", default=False,
+                      help="don't auto-detect Kerberos and do basic auth only.")
+
     maxproxyhours = 1000000.0/3600  # a million seconds
     # note that the actual max is 277.77777... hours, but that's too ugly
     #   for the usage message, so show only 277
@@ -907,7 +910,11 @@ def main():
             fatal("Did not get expected response code 401 from IdP %s, instead got code %d" % (url, notauthidphandle.code))
         return www_auth(notauthidphandle)
 
-    wwwauthenticate = dounauthrequest(unauthidpurl)
+    if not options.nodetect:
+        wwwauthenticate = dounauthrequest(unauthidpurl)
+    else:
+        if options.verbose:
+            print "Skipped initial unauth request"
 
     idphandle = None
     if options.kerberos > 0:
@@ -955,11 +962,15 @@ def main():
         if idpurl != unauthidpurl:
             wwwauthenticate = dounauthrequest(idpurl)
 
-        if 'basic' not in wwwauthenticate:
+        if not options.nodetect and 'basic' not in wwwauthenticate:
             fatal("IdP does not support password authentication")
 
         # ask for password
-        promptstr = options.promptstr.replace("%username",username)
+        if options.nodetect:
+            promptstr = "Password for %username"
+            wwwauthenticate = { 'basic' : 'realm="none"' }
+
+	promptstr = options.promptstr.replace("%username",username)
         if (promptstr.find('%realm') != -1):
             basic = wwwauthenticate['basic']
             if basic.find('realm=') == -1:
