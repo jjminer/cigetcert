@@ -1,6 +1,6 @@
 FROM docker.io/debian:stretch
 
-MAINTAINER Jon Miner <jon.miner@wisc.edu>
+MAINTAINER Jonathan J. Miner <jon.miner@wisc.edu>
 
 RUN apt-get update
 RUN apt-get -y install libssl-dev
