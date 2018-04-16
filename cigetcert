@@ -967,7 +967,7 @@ def main():
 
         # ask for password
         if options.basiconly:
-            promptstr = "Password for %username"
+            options.promptstr = "Password for %username"
             wwwauthenticate = { 'basic' : 'realm="none"' }
 
 	promptstr = options.promptstr.replace("%username",username)
