@@ -474,7 +474,8 @@ def main():
                       help="minimum hours remaining in existing cert chain " + \
                             "to keep using it instead of making a new one")
     parser.add_option("", "--basiconly", action="store_true", default=False,
-                      help="don't try to auto-detect Kerberos and do basic auth only.")
+                      help="don't try to auto-detect Kerberos and do basic auth only.  " + \
+                           "Try this if you are talking to an IdP that doesn't do Kerberos and get 500 errors.")
 
     maxproxyhours = 1000000.0/3600  # a million seconds
     # note that the actual max is 277.77777... hours, but that's too ugly
@@ -899,7 +900,7 @@ def main():
         try:
             notauthidphandle = opener.open(idprequest)
         except Exception, e:
-            efatal("Failure on (deliberately) unauthorized request to IdP %s" % url, e)
+            efatal("Failure on (deliberately) unauthorized request to IdP %s (perhaps try --basiconly if no Kerberos on IdP?)" % url, e)
 
         if options.debug:
             print "###### Begin IdP response to unauthorized request"
