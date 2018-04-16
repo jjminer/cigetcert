@@ -914,7 +914,8 @@ def main():
         wwwauthenticate = dounauthrequest(unauthidpurl)
     else:
         if options.verbose:
-            print "Skipped initial unauth request"
+            print "Skipped initial unauth request, assuming Basic Auth"
+        wwwauthenticate = { 'basic' : 'realm="none"' }
 
     idphandle = None
     if options.kerberos > 0:
@@ -962,15 +963,14 @@ def main():
         if idpurl != unauthidpurl:
             wwwauthenticate = dounauthrequest(idpurl)
 
-        if not options.basiconly and 'basic' not in wwwauthenticate:
+        if 'basic' not in wwwauthenticate:
             fatal("IdP does not support password authentication")
 
         # ask for password
         if options.basiconly:
             options.promptstr = "Password for %username"
-            wwwauthenticate = { 'basic' : 'realm="none"' }
 
-	promptstr = options.promptstr.replace("%username",username)
+        promptstr = options.promptstr.replace("%username",username)
         if (promptstr.find('%realm') != -1):
             basic = wwwauthenticate['basic']
             if basic.find('realm=') == -1:
